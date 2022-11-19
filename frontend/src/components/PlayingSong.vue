@@ -1,6 +1,9 @@
 <template>
   <div class="w-[35vh] h-[58vh]">
-    <div class="flex flex-col-reverse overflow-auto h-[58vh] z-0">
+    <!-- <div class="absolute top-0 left-0 w-[35vh] bg-white p-4 shadow-lg">
+        <p1 class="text-xl">Recently Played</p1>
+    </div> -->
+    <div class="pb-1 flex flex-col-reverse overflow-auto h-[58vh] z-0">
       <div v-if="props.previouslyplayed">
         <div
           class="song"
@@ -8,9 +11,9 @@
           v-for="item in props.previouslyplayed"
         >
           <div class="flex">
-            <img class="w-20 h-20" :src="item.item.album.images[0].url" />
+            <img class="rounded-l-lg w-20 h-20" :src="item.item.album.images[0].url" />
             <div class="h-20 pt-4 ml-4">
-              <p class="text-lg">{{ item.item.name.substring(0, 21) }}</p>
+              <p class="text-lg">{{ item.item.name.split('(')[0].substring(0, 18) }}</p>
               <p class="text-sm">{{ item.item.artists[0].name }}</p>
             </div>
           </div>
@@ -41,6 +44,6 @@ const props = defineProps(["song", "previouslyplayed"])
 
 <style>
 .song{
-    @apply mx-4 my-4 pb-0 bg-slate-100 rounded-lg shadow-sm
+    @apply mx-4 my-4 pb-0 bg-gray-100 rounded-lg shadow-sm
 }
 </style>

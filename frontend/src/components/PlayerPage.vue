@@ -4,7 +4,7 @@
       <PlayingSong :song="song" :previouslyplayed="previouslyplayed"/>
     </div>
     <MovingShapes :x="xAxis" :y="yAxis" />
-    <div class="sidebar">
+    <div class="sidebar absolute right-0 top-0">
 
     </div>
   </div>

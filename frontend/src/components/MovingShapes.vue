@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-grow h-screen duration-1000 overflow-hidden bg-slate-50">
+    <div style="width:100vw; padding-left:30vh; padding-right:30vh" class="absolute h-screen duration-1000 overflow-hidden bg-slate-50">
       <div class="w-full flex">
         <div
           class=" p-1 duration-1000 flex items-end justify-end"
