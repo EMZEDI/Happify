@@ -1,11 +1,10 @@
 <template>
-  <div class="text-center">
-    Main code
-  </div>
+  <PlaylistSetup />
+  hello
 </template>
 
-<script>
-
+<script setup>
+import PlaylistSetup from "./components/PlaylistSetup.vue";
 </script>
 
 <style>
