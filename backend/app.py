@@ -36,7 +36,16 @@ sock = Sock(app)
 USER_ID = sp.me()['id']
 
 prevPlayed = []
-
+predicted_mood = 0
+all_predictions = []
+curr_song_pred = []
+proportions =[]
+retr = []
+A = []
+B = []
+C = []
+D = []
+reset = False
 
 @app.route("/playlists")
 def get_playlists():
@@ -49,10 +58,15 @@ def previous_songs():
 @app.route("/current")
 def get_current():
     global reset
+    global predicted_mood
+    global curr_song_pred 
     playing = sp.current_user_playing_track()
     if playing:
         if playing['item']['duration_ms']- playing['progress_ms'] <= 10000:
             reset = True
+            max_value = max(curr_song_pred)
+            max_index = curr_song_pred.index(max_value)
+            predicted_mood = max_index
         else:
             reset = False
         return playing
@@ -98,8 +112,12 @@ def build_json(p_x, p_y):
 
 @sock.route('/mlresult')
 def mlinfo(ws):
-    x_axis=0.0
-    y_axis=1.0
+    global retr
+    global all_predictions
+    emotion = retr[0]
+
+    x_axis= len(all_predictions)
+    y_axis= emotion  
     local_x = x_axis
     local_y = y_axis
 
@@ -121,16 +139,14 @@ def mlinfo(ws):
             time.sleep(1.5)
         else:
             time.sleep(5)
+
+@app.route("/predictions")
+def get_prediction_average():
+    global proportions 
+    return proportions
             
 
-all_predictions = []
-curr_song_pred = []
-proportions =[]
-A = []
-B = []
-C = []
-D = []
-reset = False
+
 #Minimum threshold of eye aspect ratio below which alarm is triggerd
 EYE_ASPECT_RATIO_THRESHOLD = 0.30
 
@@ -190,15 +206,18 @@ def producer(queue, event):
 
     # logging.info("Producer received event. Exiting")
 
+
+
 def consumer(queue, event):
     global all_predictions
     global A,B,C,D
     global curr_song_pred 
     global proportions 
     global reset
+    global retr
 
     if reset:
-        curr_song_pred = []
+        curr_song_pred = [0,0,0,0]
 
     while not event.is_set() or not queue.empty():
         message = queue.get()
@@ -248,7 +267,7 @@ def consumer(queue, event):
             print("not sleep")
             retr.append(-1)
         all_predictions.append(retr)
-        curr_song_pred.append(retr)
+        # curr_song_pred.append(retr)
         
         # for pred in all_predictions:
             
@@ -256,17 +275,21 @@ def consumer(queue, event):
         print(happy,sleepy)
         if happy == 1 and sleepy == -1: 
             A.append(retr)
+            curr_song_pred[0] +=1
         
         if happy == 1 and sleepy == 1: 
             B.append(retr)
+            curr_song_pred[1] +=1
 
         if happy == -1 and sleepy == -1: 
             C.append(retr)
+            curr_song_pred[2] +=1
         
         if happy == -1 and sleepy == 1: 
             D.append(retr)
-        print(len(B), len(D))
-       
+            curr_song_pred[3] +=1
+        # print(len(B), len(D))
+        
         proportions =[len(A)/len(all_predictions), len(B)/len(all_predictions), len(C)/len(all_predictions), len(D)/len(all_predictions)]
         print(proportions)
         queue.clear()
