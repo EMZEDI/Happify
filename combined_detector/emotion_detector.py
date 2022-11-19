@@ -1,3 +1,4 @@
+from tkinter.messagebox import RETRY
 import cv2
 from deepface import DeepFace
 import numpy as np  #this will be used later in the process
@@ -40,54 +41,60 @@ predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS['left_eye']
 (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS['right_eye']
 
-#Start webcam video capture
-video_capture = cv2.VideoCapture(0)
 
-cap = cv2.VideoCapture(0)
+def detect():
+    retr = []
+    #Start webcam video capture
+    video_capture = cv2.VideoCapture(0)
 
-i = 0
-while(True):
-    ret, frame = cap.read()
-    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
-    
-    cv2.imshow('frame', rgb)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-    # if i == 60:
-        out = cv2.imwrite('capture.jpg', frame)
-        break
-    i+=1
+    cap = cv2.VideoCapture(0)
 
-cap.release()
-cv2.destroyAllWindows()
+    i = 0
+    while(True):
+        ret, frame = cap.read()
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        cv2.imshow('frame', rgb)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+        # if i == 60:
+            out = cv2.imwrite('capture.jpg', frame)
+            break
+        i+=1
 
-imgpath = 'capture.jpg' 
-image = cv2.imread(imgpath)
-analyze = DeepFace.analyze(image,actions=['emotion'])  #here the first parameter is the image we want to analyze #the second one there is the action
-print(analyze['dominant_emotion'])
+    cap.release()
+    cv2.destroyAllWindows()
 
-face = detector(gray, 0)
-face_rectangle = face_cascade.detectMultiScale(gray, 1.3, 5)
-shape = predictor(gray, face[0])
-shape = face_utils.shape_to_np(shape)
+    imgpath = 'capture.jpg' 
+    image = cv2.imread(imgpath)
+    analyze = DeepFace.analyze(image,actions=['emotion'])  #here the first parameter is the image we want to analyze #the second one there is the action
+    # print(analyze['dominant_emotion'])
+    retr.append(analyze['dominant_emotion'])
 
-#Get array of coordinates of leftEye and rightEye
-leftEye = shape[lStart:lEnd]
-rightEye = shape[rStart:rEnd]
+    face = detector(gray, 0)
+    face_rectangle = face_cascade.detectMultiScale(gray, 1.3, 5)
+    shape = predictor(gray, face[0])
+    shape = face_utils.shape_to_np(shape)
 
-#Calculate aspect ratio of both eyes
-leftEyeAspectRatio = eye_aspect_ratio(leftEye)
-rightEyeAspectRatio = eye_aspect_ratio(rightEye)
+    #Get array of coordinates of leftEye and rightEye
+    leftEye = shape[lStart:lEnd]
+    rightEye = shape[rStart:rEnd]
 
-eyeAspectRatio = (leftEyeAspectRatio + rightEyeAspectRatio) / 2
-leftEyeHull = cv2.convexHull(leftEye)
-rightEyeHull = cv2.convexHull(rightEye)
-cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
-cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
+    #Calculate aspect ratio of both eyes
+    leftEyeAspectRatio = eye_aspect_ratio(leftEye)
+    rightEyeAspectRatio = eye_aspect_ratio(rightEye)
 
-#Detect if eye aspect ratio is less than threshold
-if(eyeAspectRatio < EYE_ASPECT_RATIO_THRESHOLD):
-    print("sleepy")
-else:
-    print("not sleepy")
+    eyeAspectRatio = (leftEyeAspectRatio + rightEyeAspectRatio) / 2
+    leftEyeHull = cv2.convexHull(leftEye)
+    rightEyeHull = cv2.convexHull(rightEye)
+    cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
+    cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
+
+    #Detect if eye aspect ratio is less than threshold
+    if(eyeAspectRatio < EYE_ASPECT_RATIO_THRESHOLD):
+        retr.append("sleepy")
+    else:
+        retr.append("not sleepy")
+    return retr
+
+if __name__ == "__main__":
+    detect()
