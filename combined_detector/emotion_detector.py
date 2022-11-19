@@ -66,9 +66,13 @@ def detect():
 
     imgpath = 'capture.jpg' 
     image = cv2.imread(imgpath)
-    analyze = DeepFace.analyze(image,actions=['emotion'])  #here the first parameter is the image we want to analyze #the second one there is the action
+    try:
+        analyze = DeepFace.analyze(image,actions=['emotion']) 
+        retr.append(analyze['dominant_emotion']) #here the first parameter is the image we want to analyze #the second one there is the action
     # print(analyze['dominant_emotion'])
-    retr.append(analyze['dominant_emotion'])
+    except:
+        retr.append(0)
+        
 
     face = detector(gray, 0)
     face_rectangle = face_cascade.detectMultiScale(gray, 1.3, 5)
@@ -97,4 +101,4 @@ def detect():
     return retr
 
 if __name__ == "__main__":
-    detect()
+    print(detect())
