@@ -96,6 +96,8 @@ def mood_changer(current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, spot
     df = df[df['id'] != current_songid] # take care of repetition 
     # sort the dataframe based on the each mood
     # if the mood is overall good dont change anything
+    
+
     if longterm_emotion == 1:
         # add more dance songs 
         for feature in ["danceability", "energy", "liveness", "loudness"]:
@@ -138,7 +140,11 @@ def mood_changer(current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, spot
                     break
                 except:
                     continue
-
+    else:
+        # pick the song with the max danceability 
+        df.sort_values(by=["danceability"], inplace=True)
+        next_song = df
+        
     return next_song.iloc[0,:].id
 
 
