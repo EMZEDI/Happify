@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+* {
+    @apply transition-all
+}
+
+.sidebar{
+    @apply shadow-lg h-screen w-[35vh] z-20;
+}
