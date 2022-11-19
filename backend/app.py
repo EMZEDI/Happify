@@ -38,7 +38,6 @@ USER_ID = sp.me()['id']
 prevPlayed = []
 
 
-
 @app.route("/playlists")
 def get_playlists():
     return sp.current_user_playlists()
@@ -61,9 +60,14 @@ def get_current():
     return jsonify("None")
 
 @sock.route('/streamtrack')
-def echo(ws):
+def trackinfo(ws):
     cur = get_current()
-    ws.send(json.dumps(cur, indent = 4))
+    
+    songSend = {}
+    songSend['song'] = cur
+
+    ws.send(json.dumps(songSend, indent = 4))
+
     while True:
         tempCur = get_current()
         if(tempCur!=cur):
@@ -82,7 +86,39 @@ def echo(ws):
             songSend = {}
             songSend['song'] = tempCur
             ws.send(json.dumps(songSend, indent = 4))
-            time.sleep(.1)
+            time.sleep(1)
+        else:
+            time.sleep(5)
+
+def build_json(p_x, p_y):
+    res = {}
+    res['x'] = p_x
+    res['y'] = p_y
+    return json.dumps(res, indent=4)
+
+@sock.route('/mlresult')
+def mlinfo(ws):
+    x_axis=0.0
+    y_axis=1.0
+    local_x = x_axis
+    local_y = y_axis
+
+    ws.send(build_json(local_x, local_y))
+
+    while True:
+        if(x_axis<1):
+            x_axis=x_axis+.2
+        else:
+            x_axis=x_axis-2
+        if(y_axis<1):
+            y_axis=y_axis+.2
+        else:
+            y_axis=y_axis-2
+        if(local_y != y_axis or local_x != x_axis):
+            local_x = x_axis
+            local_y = y_axis
+            ws.send(build_json(local_x, local_y))
+            time.sleep(1.5)
         else:
             time.sleep(5)
             

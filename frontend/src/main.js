@@ -3,6 +3,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import App from './App.vue'
 
 import './assets/main.css'
+import './assets/blobz.min.css'
 
 import PlayerPage from './components/PlayerPage.vue'
 import PlaylistSetup from './components/PlaylistSetup.vue'
