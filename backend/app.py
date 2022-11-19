@@ -49,10 +49,13 @@ def previous_songs():
 
 @app.route("/current")
 def get_current():
+    global reset
     playing = sp.current_user_playing_track()
     if playing:
-        if playing['item']['duration_ms']- playing['progress_ms'] <= 10:
-            pass
+        if playing['item']['duration_ms']- playing['progress_ms'] <= 10000:
+            reset = True
+        else:
+            reset = False
         return playing
 
     return jsonify("None")
@@ -91,6 +94,7 @@ A = []
 B = []
 C = []
 D = []
+reset = False
 #Minimum threshold of eye aspect ratio below which alarm is triggerd
 EYE_ASPECT_RATIO_THRESHOLD = 0.30
 
@@ -121,7 +125,7 @@ predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS['right_eye']
 
 
-def producer(queue, event,reset):
+def producer(queue, event):
     """Pretend we're getting a number from the network."""
     while not event.is_set() or queue.empty():
         # while True:
@@ -150,11 +154,13 @@ def producer(queue, event,reset):
 
     # logging.info("Producer received event. Exiting")
 
-def consumer(queue, event,reset):
+def consumer(queue, event):
     global all_predictions
     global A,B,C,D
     global curr_song_pred 
     global proportions 
+    global reset
+
     if reset:
         curr_song_pred = []
 
@@ -255,14 +261,13 @@ def consumer(queue, event,reset):
 
 
 
-if __name__ == "__main__":
+def start_prediction():
     pipeline = queue.Queue(maxsize=1)
     event = threading.Event()
-    reset = False
     while True:
         with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-            executor.submit(producer, pipeline, event, reset)
-            executor.submit(consumer, pipeline, event,reset)
+            executor.submit(producer, pipeline, event)
+            executor.submit(consumer, pipeline, event)
             # executor.submit(calculate, pipeline, event)
             # time.sleep(0.1)
             event.set()
