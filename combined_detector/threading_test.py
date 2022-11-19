@@ -18,7 +18,11 @@ import numpy as np
 import time
 import dlib
 import cv2
-
+all_predictions = []
+A = []
+B = []
+C = []
+D = []
 #Minimum threshold of eye aspect ratio below which alarm is triggerd
 EYE_ASPECT_RATIO_THRESHOLD = 0.30
 
@@ -79,6 +83,7 @@ def producer(queue, event):
     # logging.info("Producer received event. Exiting")
 
 def consumer(queue, event):
+    global all_predictions
     while not event.is_set() or not queue.empty():
         message = queue.get()
 
@@ -89,7 +94,11 @@ def consumer(queue, event):
         image = cv2.imread(imgpath)
         try:
             analyze = DeepFace.analyze(image,actions=['emotion']) 
-            retr.append(analyze['dominant_emotion']) #here the first parameter is the image we want to analyze #the second one there is the action
+            if analyze['dominant_emotion'] in ['sad', 'fear', 'digust', 'scared']:
+                retr.append(-1)
+            elif analyze['dominant_emotion'] in ['happy', 'surprised','neutral']:
+                retr.append(1)
+            retr.append() #here the first parameter is the image we want to analyze #the second one there is the action
             print(analyze['dominant_emotion'])
         except:
             retr.append(0)
@@ -117,11 +126,28 @@ def consumer(queue, event):
         #Detect if eye aspect ratio is less than threshold
         if(eyeAspectRatio < EYE_ASPECT_RATIO_THRESHOLD):
             print("sleepy")
-            retr.append("sleepy")
+            retr.append(1)
         else:
             print("not sleep")
-            retr.append("not sleepy")
-        return retr
+            retr.append(-1)
+        all_predictions.append(retr)
+
+def calculate():
+    for pred in all_predictions:
+        happy, sleepy = pred
+        if happy == 1 and sleepy == -1: 
+            A.append(pred)
+        
+        if happy == 1 and sleepy == 1: 
+            B.append(pred)
+
+        if happy == -1 and sleepy == -1: 
+            C.append(pred)
+        
+        if happy ==- -1 and sleepy == 1: 
+            D.append(pred)
+
+
 
 if __name__ == "__main__":
     pipeline = queue.Queue(maxsize=1)
@@ -130,6 +156,5 @@ if __name__ == "__main__":
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
             executor.submit(producer, pipeline, event)
             executor.submit(consumer, pipeline, event)
-
-            time.sleep(0.1)
+            # time.sleep(0.1)
             event.set()
