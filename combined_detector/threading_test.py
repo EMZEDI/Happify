@@ -84,6 +84,7 @@ def producer(queue, event):
 
 def consumer(queue, event):
     global all_predictions
+    global A,B,C,D
     while not event.is_set() or not queue.empty():
         message = queue.get()
 
@@ -98,9 +99,10 @@ def consumer(queue, event):
                 retr.append(-1)
             elif analyze['dominant_emotion'] in ['happy', 'surprised','neutral']:
                 retr.append(1)
-            retr.append() #here the first parameter is the image we want to analyze #the second one there is the action
+            # retr.append() #here the first parameter is the image we want to analyze #the second one there is the action
             print(analyze['dominant_emotion'])
-        except:
+        except Exception as e: 
+            print(e)
             retr.append(0)
             
 
@@ -131,21 +133,51 @@ def consumer(queue, event):
             print("not sleep")
             retr.append(-1)
         all_predictions.append(retr)
-
-def calculate():
-    for pred in all_predictions:
-        happy, sleepy = pred
+        
+        # for pred in all_predictions:
+            
+        happy, sleepy = retr
+        print(happy,sleepy)
         if happy == 1 and sleepy == -1: 
-            A.append(pred)
+            A.append(retr)
         
         if happy == 1 and sleepy == 1: 
-            B.append(pred)
+            B.append(retr)
 
         if happy == -1 and sleepy == -1: 
-            C.append(pred)
+            C.append(retr)
         
         if happy ==- -1 and sleepy == 1: 
-            D.append(pred)
+            D.append(retr)
+        print(len(B), len(D))
+       
+        ret_val =[len(A)/len(all_predictions), len(B)/len(all_predictions), len(C)/len(all_predictions), len(D)/len(all_predictions)]
+        print(ret_val)
+        queue.clear()
+    
+
+def calculate(queue, event):
+    global all_predictions
+    
+    while not event.is_set() or not queue.empty():
+        print(len(all_predictions))
+        for pred in all_predictions:
+            if happy != 0:
+                happy, sleepy = pred
+                if happy == 1 and sleepy == -1: 
+                    A.append(pred)
+                
+                if happy == 1 and sleepy == 1: 
+                    B.append(pred)
+
+                if happy == -1 and sleepy == -1: 
+                    C.append(pred)
+                
+                if happy ==- -1 and sleepy == 1: 
+                    D.append(pred)
+        ret_val =[len(A)/len(all_predictions), len(B)/len(all_predictions), len(C)/len(all_predictions), len(D)/len(all_predictions)]
+        print(ret_val)
+    return(ret_val)
 
 
 
@@ -153,8 +185,9 @@ if __name__ == "__main__":
     pipeline = queue.Queue(maxsize=1)
     event = threading.Event()
     while True:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
             executor.submit(producer, pipeline, event)
             executor.submit(consumer, pipeline, event)
+            # executor.submit(calculate, pipeline, event)
             # time.sleep(0.1)
             event.set()
