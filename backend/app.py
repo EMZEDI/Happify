@@ -1,3 +1,4 @@
+import json
 import time
 from flask import Flask, jsonify
 import spotipy
@@ -16,13 +17,17 @@ sock = Sock(app)
 
 USER_ID = sp.me()['id']
 
+prevPlayed = []
+
+
+
 @app.route("/playlists")
 def get_playlists():
     return sp.current_user_playlists()
 
 @app.route("/previoussongs")
 def previous_songs():
-    return sp.current_user_recently_played()
+    return sp.current_user_recently_played(limit=12)
 
 @app.route("/current")
 def get_current():
@@ -34,12 +39,25 @@ def get_current():
 @sock.route('/streamtrack')
 def echo(ws):
     cur = get_current()
-    ws.send(cur)
+    ws.send(json.dumps(cur, indent = 4))
     while True:
         tempCur = get_current()
         if(tempCur!=cur):
+            if(tempCur and tempCur["item"]["name"] != cur["item"]["name"]):
+                # print(tempCur["item"]["name"])
+                prevPlayed.append(cur)
+                if(len(prevPlayed) > 14):
+                    prevPlayed.pop(0)
+                # for item in prevPlayed:
+                #     print(item["item"]["name"])
+                listjson = json.dumps(prevPlayed)
+                arraySend = {}
+                arraySend['played'] = listjson
+                ws.send(json.dumps(arraySend, indent=4))
             cur = tempCur
-            ws.send(tempCur)
-            time.sleep(1)
+            songSend = {}
+            songSend['song'] = tempCur
+            ws.send(json.dumps(songSend, indent = 4))
+            time.sleep(.1)
         else:
             time.sleep(5)
