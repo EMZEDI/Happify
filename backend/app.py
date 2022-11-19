@@ -51,7 +51,10 @@ def previous_songs():
 def get_current():
     playing = sp.current_user_playing_track()
     if playing:
+        if playing['item']['duration_ms']- playing['progress_ms'] <= 10:
+            pass
         return playing
+
     return jsonify("None")
 
 @sock.route('/streamtrack')
@@ -83,6 +86,7 @@ def echo(ws):
 
 all_predictions = []
 curr_song_pred = []
+proportions =[]
 A = []
 B = []
 C = []
@@ -150,6 +154,7 @@ def consumer(queue, event,reset):
     global all_predictions
     global A,B,C,D
     global curr_song_pred 
+    global proportions 
     if reset:
         curr_song_pred = []
 
@@ -216,12 +221,12 @@ def consumer(queue, event,reset):
         if happy == -1 and sleepy == -1: 
             C.append(retr)
         
-        if happy ==- -1 and sleepy == 1: 
+        if happy == -1 and sleepy == 1: 
             D.append(retr)
         print(len(B), len(D))
        
-        ret_val =[len(A)/len(all_predictions), len(B)/len(all_predictions), len(C)/len(all_predictions), len(D)/len(all_predictions)]
-        print(ret_val)
+        proportions =[len(A)/len(all_predictions), len(B)/len(all_predictions), len(C)/len(all_predictions), len(D)/len(all_predictions)]
+        print(proportions)
         queue.clear()
     
 
