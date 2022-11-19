@@ -1,14 +1,3 @@
 <template>
-  <PlayerPage/>
-  <PlaylistSetup />
-  hello
+  <router-view />
 </template>
-
-<script setup>
-import PlaylistSetup from "./components/PlaylistSetup.vue";
-import PlayerPage from "./components/PlayerPage.vue";
-</script>
-
-<style>
-
-</style>
