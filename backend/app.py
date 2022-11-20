@@ -1,6 +1,6 @@
 import json
 import time
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from spotipy.oauth2 import SpotifyOAuth
@@ -155,16 +155,20 @@ def get_prediction_average():
     global proportions 
     return proportions
 
-@app.route("/submit-playlists")
+@app.route("/submit-playlists", methods=["POST"])
 def receive_playlists():
     global happy_prod
     global happy_unprod 
     global sad_prod 
     global sad_unprod 
-    happy_prod = A
-    happy_unprod = B
-    sad_prod = C
-    sad_unprod = D
+    happy_prod = request.json['happy_prod']
+    happy_unprod = request.json['happy_unprod']
+    sad_prod = request.json['sad_prod']
+    sad_unprod = request.json['sad_unprod']
+    print(happy_prod)
+    print(happy_unprod)
+    print(sad_prod)
+    print(sad_unprod)
     t1 = threading.Thread(target=p, args=())
     t1.start()
     return {}
