@@ -72,11 +72,22 @@ def get_current():
         curr_song_id = playing['item']['artists'][0]['id']
         if playing['item']['duration_ms'] - playing['progress_ms'] <= 20000:
             reset = True
-            max_value = max(curr_song_pred)
-            max_index = curr_song_pred.index(max_value)
-            predicted_mood = max_index
-            # next_song_id must be sent to the front to be displayed
-            next_song_id, random_second_next = mood_changer(curr_song_id, happy_prod, happy_unprod, sad_prod, sad_unprod, max_index, sp)
+            if len(curr_song_pred) > 0:
+                max_value = max(curr_song_pred)
+                max_index = curr_song_pred.index(max_value)
+                predicted_mood = max_index
+                # next_song_id must be sent to the front to be displayed
+                print("here")
+                print(curr_song_id)
+                print(happy_prod)
+                print(happy_unprod)
+                print(sad_unprod)
+                print(sad_prod)
+                print(sad_unprod)
+                print(max_index)
+                print(sp)
+                print("finished here")
+                next_song_id, random_second_next = mood_changer(curr_song_id, happy_prod, happy_unprod, sad_prod, sad_unprod, max_index, sp)
         else:
             reset = False
         return playing
@@ -124,12 +135,16 @@ def build_json(p_x, p_y):
 def mlinfo(ws):
     global retr
     global all_predictions
-    emotion = retr[0]
+    local_x =0
+    local_y =0
+    if len(retr) > 0:
+        emotion = retr[0]
+        # print(retr)
 
-    x_axis= len(all_predictions)
-    y_axis= emotion  
-    local_x = x_axis
-    local_y = y_axis
+        x_axis= len(all_predictions)
+        y_axis= emotion  
+        local_x = x_axis
+        local_y = y_axis
 
     ws.send(build_json(local_x, local_y))
 
@@ -161,14 +176,14 @@ def receive_playlists():
     global happy_unprod 
     global sad_prod 
     global sad_unprod 
-    happy_prod = request.json['happy_prod']
-    happy_unprod = request.json['happy_unprod']
-    sad_prod = request.json['sad_prod']
-    sad_unprod = request.json['sad_unprod']
-    print(happy_prod)
-    print(happy_unprod)
-    print(sad_prod)
-    print(sad_unprod)
+    happy_prod = request.json['happy_prod']['id']
+    happy_unprod = request.json['happy_unprod']['id']
+    sad_prod = request.json['sad_prod']['id']
+    sad_unprod = request.json['sad_unprod']['id']
+    # print(happy_prod)
+    # print(happy_unprod)
+    # print(sad_prod)
+    # print(sad_unprod)
     t1 = threading.Thread(target=p, args=())
     t1.start()
     return {}
