@@ -71,6 +71,7 @@ def get_current():
     global curr_song_pred 
     global first_iter
     global random_second_next
+    global song_history
     playing = sp.current_user_playing_track()
     if playing:
         # print(playing['item']['id'])
@@ -349,7 +350,7 @@ def consumer(queue, event):
         #Detect if eye aspect ratio is less than threshold
 
         if analyze['dominant_emotion'] == "happy":
-            # print("happy here")
+            print("happy here")
             EYE_ASPECT_RATIO_THRESHOLD = 0.05
         else:
             EYE_ASPECT_RATIO_THRESHOLD = 0.24
