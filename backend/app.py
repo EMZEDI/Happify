@@ -1,4 +1,5 @@
 import json
+import random
 import time
 from flask import Flask, jsonify, request
 import spotipy
@@ -46,6 +47,7 @@ all_predictions = []
 curr_song_pred = [0,0,0,0]
 proportions =[]
 retr = []
+retr_prob = []
 A = []
 B = []
 C = []
@@ -174,6 +176,7 @@ def build_json(p_x, p_y):
 def mlinfo(ws):
     global retr
     global all_predictions
+    global retr_prob
     local_x =0
     local_y =0
     y_axis = 0
@@ -192,15 +195,15 @@ def mlinfo(ws):
     while True:
         if len(retr) > 1:
             # print("valid values, reseeting ")
-            y_axis = retr[0]
-            x_axis= retr[1]
+            y_axis = retr_prob[0]
+            x_axis= retr_prob[1]
         # if(local_y != y_axis or local_x != x_axis):
             # print("HERE")
             # print(local_x , local_y)
         # local_x = x_axis
         # local_y = y_axis
         # print(local_x , local_y)
-        ws.send(build_json(-x_axis, y_axis))
+        ws.send(build_json(x_axis, y_axis))
         time.sleep(1.5)
         # else:
         #     # print("NO UPDATE")
@@ -303,6 +306,7 @@ def consumer(queue, event):
     global proportions 
     global reset
     global retr
+    global retr_prob
 
     if reset:
         curr_song_pred = [0,0,0,0]
@@ -312,15 +316,24 @@ def consumer(queue, event):
 
         imgpath, rgb, gray,frame = message
         retr = []
+        retr_prob = []
         """Pretend we're saving a number in the database."""
         # imgpath = 'capture.jpg' 
         image = cv2.imread(imgpath)
         try:
+            
             analyze = DeepFace.analyze(image,actions=['emotion']) 
+            dom =analyze['dominant_emotion']
+            dom_prob = (analyze['emotion'][dom])/100
+            print("dom", dom)
+            print(analyze)
+            print("DOM PROB", dom_prob)
             if analyze['dominant_emotion'] in ['sad', 'fear', 'digust', 'scared']:
+                retr_prob.append(-dom_prob)
                 retr.append(-1)
             elif analyze['dominant_emotion'] in ['happy', 'surprised','neutral']:
                 retr.append(1)
+                retr_prob.append(dom_prob)
             # retr.append() #here the first parameter is the image we want to analyze #the second one there is the action
             # print(analyze['dominant_emotion'])
         except Exception as e: 
@@ -358,9 +371,11 @@ def consumer(queue, event):
         if(eyeAspectRatio < EYE_ASPECT_RATIO_THRESHOLD):
             print("sleepy")
             retr.append(1)
+            retr_prob.append(-random.uniform(0.0, 1.0))
         else:
             print("not sleep")
             retr.append(-1)
+            retr_prob.append(-random.uniform(-1.0, -1.0))
         all_predictions.append(retr)
         # curr_song_pred.append(retr)
         
@@ -370,19 +385,19 @@ def consumer(queue, event):
         print(happy,sleepy)
         if happy == 1 and sleepy == -1: 
             A.append(retr)
-            curr_song_pred[0] +=3
+            curr_song_pred[0] +=10
         
         if happy == 1 and sleepy == 1: 
             B.append(retr)
-            curr_song_pred[1] +=3
+            curr_song_pred[1] +=10
 
         if happy == -1 and sleepy == -1: 
             C.append(retr)
-            curr_song_pred[2] +=3
+            curr_song_pred[2] +=10
         
         if happy == -1 and sleepy == 1: 
             D.append(retr)
-            curr_song_pred[3] +=3
+            curr_song_pred[3] +=10
         
 
         # print(len(B), len(D)x)
