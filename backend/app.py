@@ -151,7 +151,7 @@ def get_prediction_average():
     return proportions
 
 @app.route("/submit-playlists")
-def receive_playlists(A,B,C,D):
+def receive_playlists():
     global happy_prod
     global happy_unprod 
     global sad_prod 
@@ -160,23 +160,31 @@ def receive_playlists(A,B,C,D):
     happy_unprod = B
     sad_prod = C
     sad_unprod = D
-    return True
+    t1 = threading.Thread(target=p, args=())
+    t1.start()
+    return {}
 
+   
 
-def start_prediction():
+def p():
+    # print("im here")
     pipeline = queue.Queue(maxsize=1)
     event = threading.Event()
     while True:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
             executor.submit(producer, pipeline, event)
             executor.submit(consumer, pipeline, event)
+            # executor.submit(calculate, pipeline, event)
+            # time.sleep(0.1)
             event.set()
-    
+
+
+
 
     # return True
 
 #Minimum threshold of eye aspect ratio below which alarm is triggerd
-EYE_ASPECT_RATIO_THRESHOLD = 0.30
+EYE_ASPECT_RATIO_THRESHOLD = 0.24
 
 #Minimum consecutive frames for which eye ratio is below threshold for alarm to be triggered
 EYE_ASPECT_RATIO_CONSEC_FRAMES = 10
@@ -275,6 +283,13 @@ def consumer(queue, event):
         cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
 
         #Detect if eye aspect ratio is less than threshold
+
+        if analyze['dominant_emotion'] == "happy":
+            # print("happy here")
+            EYE_ASPECT_RATIO_THRESHOLD = 0.05
+        else:
+            EYE_ASPECT_RATIO_THRESHOLD = 0.24
+
         if(eyeAspectRatio < EYE_ASPECT_RATIO_THRESHOLD):
             print("sleepy")
             retr.append(1)
