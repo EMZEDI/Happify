@@ -66,7 +66,8 @@ def get_current():
     global curr_song_pred 
     playing = sp.current_user_playing_track()
     if playing:
-        if playing['item']['duration_ms']- playing['progress_ms'] <= 10000:
+        curr_song_id = playing['item']['artists'][0]['id']
+        if playing['item']['duration_ms'] - playing['progress_ms'] <= 10000:
             reset = True
             max_value = max(curr_song_pred)
             max_index = curr_song_pred.index(max_value)
@@ -150,7 +151,7 @@ def get_prediction_average():
     return proportions
 
 @app.route("/submit-playlists")
-def get_prediction_average(A,B,C,D):
+def receive_playlists(A,B,C,D):
     global happy_prod
     global happy_unprod 
     global sad_prod 
@@ -160,10 +161,6 @@ def get_prediction_average(A,B,C,D):
     sad_prod = C
     sad_unprod = D
     return True
-
-    
-                     
-
 
 #Minimum threshold of eye aspect ratio below which alarm is triggerd
 EYE_ASPECT_RATIO_THRESHOLD = 0.30
