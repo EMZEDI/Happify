@@ -167,6 +167,19 @@ def receive_playlists(A,B,C,D):
     sad_unprod = D
     return True
 
+
+def start_prediction():
+    pipeline = queue.Queue(maxsize=1)
+    event = threading.Event()
+    while True:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            executor.submit(producer, pipeline, event)
+            executor.submit(consumer, pipeline, event)
+            event.set()
+    
+
+    # return True
+
 #Minimum threshold of eye aspect ratio below which alarm is triggerd
 EYE_ASPECT_RATIO_THRESHOLD = 0.30
 
@@ -295,7 +308,7 @@ def consumer(queue, event):
         if happy == -1 and sleepy == 1: 
             D.append(retr)
             curr_song_pred[3] +=1
-        # print(len(B), len(D))
+        # print(len(B), len(D)x)
         
         proportions =[len(A)/len(all_predictions), len(B)/len(all_predictions), len(C)/len(all_predictions), len(D)/len(all_predictions)]
         print(proportions)
