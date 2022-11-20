@@ -166,7 +166,7 @@
         </div>
       </div>
     </div>
-    <div :class="(condition)?'w-1/5':'w-0'" class="flex items-center justify-center h-screen hover:bg-green-300 cursor-pointer" @click="submitPlaylists">
+    <div :class="(condition)?'w-1/5':'w-0'" class="transition-500 flex items-center justify-center h-screen hover:bg-green-300 cursor-pointer" @click="submitPlaylists">
       <div class="text-xl">
         Continue &rarr;
       </div>

@@ -3,7 +3,7 @@
     <div class="sidebar">
       <PlayingSong :song="song" :previouslyplayed="previouslyplayed"/>
     </div>
-    <MovingShapes :x="xAxis" :y="yAxis" />
+    <MovingShapes :x="xAxisAvg" :y="yAxisAvg" />
     <div class="sidebar absolute right-0 top-0">
       <RightBar :x="xAxis" :y="yAxis"/>
     </div>
@@ -28,6 +28,9 @@ const previouslyplayed = ref(null);
 const xAxis = ref(-0.5);
 const yAxis = ref(0.5);
 
+const yAxisAvg = ref(0.5);
+const xAxisAvg = ref(-0.5);
+
 onMounted(() => {
   // axios.get("http://127.0.0.1:3000/previoussongs").then((response) => {
   //   previouslyplayed.value = response.data;
@@ -47,6 +50,8 @@ onMounted(() => {
     let blob = JSON.parse(event.data);
     xAxis.value = blob.x;
     yAxis.value = blob.y;
+    xAxisAvg.value = blob.avgx;
+    yAxisAvg.value = blob.avgy;
   };
 });
 </script>

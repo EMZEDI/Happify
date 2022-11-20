@@ -43,7 +43,7 @@ sad_unprod = 0
 prevPlayed = []
 predicted_mood = 0
 all_predictions = []
-curr_song_pred = []
+curr_song_pred = [0,0,0,0]
 proportions =[]
 retr = []
 A = []
@@ -113,6 +113,9 @@ def trackinfo(ws):
         tempCur = get_current()
         if(tempCur!=cur):
             if(tempCur and tempCur["item"]["name"] != cur["item"]["name"]):
+                print("RESET in getcurloop")
+                global curr_song_pred
+                curr_song_pred = [0,0,0,0]
                 # print(tempCur["item"]["name"])
                 prevPlayed.append(cur)
                 if(len(prevPlayed) > 14):
@@ -132,9 +135,18 @@ def trackinfo(ws):
             time.sleep(5)
 
 def build_json(p_x, p_y):
+    global curr_song_pred
     res = {}
     res['x'] = p_x
     res['y'] = p_y
+    if sum(curr_song_pred) != 0:
+        res['avgx'] = ((curr_song_pred[0] + curr_song_pred[2]) *1 + ((curr_song_pred[1] + curr_song_pred[3]) * -1 ))/ (sum(curr_song_pred))
+        res['avgy'] = ((curr_song_pred[0] + curr_song_pred[1]) *1 + ((curr_song_pred[2] + curr_song_pred[3]) * -1 ))/ (sum(curr_song_pred))
+        print(res['avgx'], res['avgy'])
+    else:
+        res['avgx'] = 0
+        res['avgy'] = 0
+
     return json.dumps(res, indent=4)
 
 @sock.route('/mlresult')
@@ -161,17 +173,17 @@ def mlinfo(ws):
             # print("valid values, reseeting ")
             y_axis = retr[0]
             x_axis= retr[1]
-        if(local_y != y_axis or local_x != x_axis):
+        # if(local_y != y_axis or local_x != x_axis):
             # print("HERE")
             # print(local_x , local_y)
-            local_x = x_axis
-            local_y = y_axis
-            # print(local_x , local_y)
-            ws.send(build_json(local_x, -local_y))
-            time.sleep(1.5)
-        else:
-            # print("NO UPDATE")
-            time.sleep(1.5)
+        # local_x = x_axis
+        # local_y = y_axis
+        # print(local_x , local_y)
+        ws.send(build_json(-x_axis, y_axis))
+        time.sleep(1.5)
+        # else:
+        #     # print("NO UPDATE")
+        #     time.sleep(1.5)
 
 @app.route("/predictions")
 def get_prediction_average():
@@ -337,19 +349,21 @@ def consumer(queue, event):
         print(happy,sleepy)
         if happy == 1 and sleepy == -1: 
             A.append(retr)
-            curr_song_pred[0] +=1
+            curr_song_pred[0] +=3
         
         if happy == 1 and sleepy == 1: 
             B.append(retr)
-            curr_song_pred[1] +=1
+            curr_song_pred[1] +=3
 
         if happy == -1 and sleepy == -1: 
             C.append(retr)
-            curr_song_pred[2] +=1
+            curr_song_pred[2] +=3
         
         if happy == -1 and sleepy == 1: 
             D.append(retr)
-            curr_song_pred[3] +=1
+            curr_song_pred[3] +=3
+        
+
         # print(len(B), len(D)x)
         
         proportions =[len(A)/len(all_predictions), len(B)/len(all_predictions), len(C)/len(all_predictions), len(D)/len(all_predictions)]

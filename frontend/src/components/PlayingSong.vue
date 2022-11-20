@@ -13,7 +13,7 @@
           <div class="flex">
             <img class="rounded-l-lg w-20 h-20" :src="item.item.album.images[0].url" />
             <div class="h-20 pt-4 ml-4">
-              <p class="text-lg">{{ item.item.name.split('(')[0].substring(0, 17) }}</p>
+              <p class="text-lg">{{ item.item.name.split('(')[0].substring(0, 15) }}</p>
               <p class="text-sm">{{ item.item.artists[0].name }}</p>
             </div>
           </div>
@@ -27,7 +27,7 @@
         <div>
         <img class="mt-4 w-[30vh] h-[30vh] shadow-md rounded-lg" :src="props.song.item.album.images[0].url" />
         <div class="mt-2">
-            <p class="text-xl">{{ props.song.item.name.substring(0, 25) }}</p>
+            <p class="text-xl">{{ props.song.item.name.substring(0, 23) }}</p>
         <p class="text-lg">{{ props.song.item.artists[0].name }}</p>
         </div>
     </div>
