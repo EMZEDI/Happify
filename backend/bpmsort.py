@@ -97,6 +97,7 @@ def mood_changer(current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, spot
     # sort the dataframe based on the each mood
     # if the mood is overall good dont change anything
     random_second_next = df.sample(1)
+    next_song = df.sample(1)
 
     if longterm_emotion == 1:
         # add more dance songs 
