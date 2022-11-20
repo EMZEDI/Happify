@@ -90,6 +90,8 @@ def mood_changer(current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, spot
     A function designed to find the best choice to make the user happier
     """
     
+    # TODO: the current song will be given as a json object 
+
     current_features = get_song_features(current_songid, spot)
     item = [pl1, pl2, pl3, pl4][longterm_emotion]
     df = create_feature_dataset([item], spot)
