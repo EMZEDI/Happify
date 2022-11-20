@@ -5,7 +5,7 @@
     </div>
     <MovingShapes :x="xAxis" :y="yAxis" />
     <div class="sidebar absolute right-0 top-0">
-
+      <RightBar :x="xAxis" :y="yAxis"/>
     </div>
   </div>
 </template>
@@ -13,6 +13,7 @@
 <script setup>
 import MovingShapes from './MovingShapes.vue'
 import PlayingSong from './PlayingSong.vue'
+import RightBar from './RightBar.vue'
 import { ref, onMounted } from "vue";
 // import axios from "axios";
 
@@ -24,7 +25,7 @@ const song = ref(null);
 
 const previouslyplayed = ref(null);
 
-const xAxis = ref(0.5);
+const xAxis = ref(-0.5);
 const yAxis = ref(0.5);
 
 onMounted(() => {
