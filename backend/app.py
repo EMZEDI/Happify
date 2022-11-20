@@ -35,6 +35,10 @@ sock = Sock(app)
 
 USER_ID = sp.me()['id']
 
+happy_prod = 0 #playlists
+happy_unprod = 0 
+sad_prod = 0
+sad_unprod = 0
 prevPlayed = []
 predicted_mood = 0
 all_predictions = []
@@ -144,7 +148,21 @@ def mlinfo(ws):
 def get_prediction_average():
     global proportions 
     return proportions
-            
+
+@app.route("/submit-playlists")
+def get_prediction_average(A,B,C,D):
+    global happy_prod
+    global happy_unprod 
+    global sad_prod 
+    global sad_unprod 
+    happy_prod = A
+    happy_unprod = B
+    sad_prod = C
+    sad_unprod = D
+    return True
+
+    
+                     
 
 
 #Minimum threshold of eye aspect ratio below which alarm is triggerd
@@ -187,25 +205,12 @@ def producer(queue, event):
         ret, frame = cap.read()
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        # cv2.imshow('frame', rgb)
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        # if i == 60:
         out = cv2.imwrite('capture.jpg', frame)
-        # break
-            # i+=1
-
         cap.release()
-    # cv2.destroyAllWindows()
 
-
-
-        # message = random.randint(1, 101)
         message = ['capture.jpg', rgb, gray,frame]
-        # logging.info("Producer got message: %s", message)
+
         queue.put(message)
-
-    # logging.info("Producer received event. Exiting")
-
 
 
 def consumer(queue, event):
@@ -293,32 +298,6 @@ def consumer(queue, event):
         proportions =[len(A)/len(all_predictions), len(B)/len(all_predictions), len(C)/len(all_predictions), len(D)/len(all_predictions)]
         print(proportions)
         queue.clear()
-    
-
-# def calculate(queue, event):
-#     global all_predictions
-    
-#     while not event.is_set() or not queue.empty():
-#         print(len(all_predictions))
-#         for pred in all_predictions:
-#             if happy != 0:
-#                 happy, sleepy = pred
-#                 if happy == 1 and sleepy == -1: 
-#                     A.append(pred)
-                
-#                 if happy == 1 and sleepy == 1: 
-#                     B.append(pred)
-
-#                 if happy == -1 and sleepy == -1: 
-#                     C.append(pred)
-                
-#                 if happy ==- -1 and sleepy == 1: 
-#                     D.append(pred)
-#         ret_val =[len(A)/len(all_predictions), len(B)/len(all_predictions), len(C)/len(all_predictions), len(D)/len(all_predictions)]
-#         print(ret_val)
-#     return(ret_val)
-
-
 
 def start_prediction():
     pipeline = queue.Queue(maxsize=1)
@@ -327,6 +306,4 @@ def start_prediction():
         with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
             executor.submit(producer, pipeline, event)
             executor.submit(consumer, pipeline, event)
-            # executor.submit(calculate, pipeline, event)
-            # time.sleep(0.1)
             event.set()
