@@ -57,6 +57,11 @@ song_history = {}
 random_second_next = None
 first_iter = True
 
+random_next = None
+
+songflip = False
+next_song_id = None
+
 @app.route("/playlists")
 def get_playlists():
     return sp.current_user_playlists()
@@ -67,6 +72,7 @@ def previous_songs():
 
 @app.route("/current")
 def get_current():
+    global songflip
     global next_song_id
     global reset
     global predicted_mood
@@ -78,7 +84,7 @@ def get_current():
     if playing:
         # print(playing['item']['id'])
         curr_song_id = playing['item']['id']
-        if(playing['item']['duration_ms'] - playing['progress_ms'] <= 20000):
+        if(playing['item']['duration_ms'] - playing['progress_ms'] <= 15000):
             if(reset!=True):
                 print("RESET",reset)
                 reset = True
@@ -105,9 +111,11 @@ def get_current():
 
                     print(random_second_next)
                     sp.add_to_queue(next_song_id)
+                    songflip = True
                     # sp.add_to_queue(random_second_next)
         else:
             reset = False
+            songflip = False
         return playing
 
     return jsonify("None")
@@ -122,20 +130,37 @@ def trackinfo(ws):
     ws.send(json.dumps(songSend, indent = 4))
 
     global random_second_next
+    global next_song_id
+    global songflip
 
-    sent_next = random_second_next
+    random_next = random_second_next
+    next_song = next_song_id
+
+    songflip = False
+    
+
     while True:
-        if(random_second_next!=None and random_second_next!=sent_next):
-            sent_next = random_second_next
-            songSend = {}
-            print("sending next")
-            uptrackinfo = sp.track(sent_next)
-            print(uptrackinfo)
-            songSend['upnext'] = uptrackinfo
-            ws.send(json.dumps(songSend, indent = 4))
+        if(songflip and next_song_id!=None and next_song!=next_song_id):
+                    next_song = next_song_id
+                    songSend = {}
+                    print("sending next actual")
+                    uptrackinfo = sp.track(next_song)
+                    print(uptrackinfo)
+                    songSend['upnext'] = uptrackinfo
+                    ws.send(json.dumps(songSend, indent = 4))
         tempCur = get_current()
         if(tempCur!=cur):
             if(tempCur and tempCur["item"]["name"] != cur["item"]["name"]):
+                if(random_second_next!=None and random_second_next!=random_next):
+                    random_next = random_second_next
+                    songSend = {}
+                    print("sending next random")
+                    uptrackinfo = sp.track(random_next)
+                    print(uptrackinfo)
+                    songSend['upnext'] = uptrackinfo
+                    ws.send(json.dumps(songSend, indent = 4))
+
+                songflip = False
                 print("RESET in getcurloop")
                 global curr_song_pred
                 curr_song_pred = [0,0,0,0]
