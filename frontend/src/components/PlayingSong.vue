@@ -13,7 +13,7 @@
           <div class="flex">
             <img class="rounded-l-lg w-20 h-20" :src="item.item.album.images[0].url" />
             <div class="h-20 pt-4 ml-4">
-              <p class="text-lg">{{ item.item.name.split('(')[0].substring(0, 18) }}</p>
+              <p class="text-lg">{{ item.item.name.split('(')[0].substring(0, 17) }}</p>
               <p class="text-sm">{{ item.item.artists[0].name }}</p>
             </div>
           </div>

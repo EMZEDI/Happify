@@ -7,10 +7,11 @@ import './assets/blobz.min.css'
 
 import PlayerPage from './components/PlayerPage.vue'
 import PlaylistSetup from './components/PlaylistSetup.vue'
-
+import WelcomePage from './components/WelcomePage.vue'
 
 const routes = [
-    { path: '/', component: PlaylistSetup },
+    { path: '/', component: WelcomePage },
+    { path: '/setup', component: PlaylistSetup },
     { path: '/dashboard', component: PlayerPage },
 ]
 const router = createRouter({

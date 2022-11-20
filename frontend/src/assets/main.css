@@ -17,5 +17,5 @@
 }
 
 .sidebar{
-    @apply shadow-lg h-screen w-[35vh] z-20 bg-white/90;
+    @apply shadow-lg h-screen w-[35vh] z-20 backdrop-blur-xl;
 }
