@@ -69,28 +69,32 @@ def get_current():
     global random_second_next
     playing = sp.current_user_playing_track()
     if playing:
-        curr_song_id = playing['item']['artists'][0]['id']
-        if reset != True and (playing['item']['duration_ms'] - playing['progress_ms'] <= 20000):
-            reset = True
-            if len(curr_song_pred) > 0:
-                max_value = max(curr_song_pred)
-                max_index = curr_song_pred.index(max_value)
-                predicted_mood = max_index
-                # next_song_id must be sent to the front to be displayed
-                # print("here")
-                # print(curr_song_id)
-                # print(happy_prod)
-                # print(happy_unprod)
-                # print(sad_unprod)
-                # print(sad_prod)
-                # print(sad_unprod)
-                # print(max_index)
-                # print(sp)
-                print("finished here")
-                next_song_id, random_second_next = mood_changer(curr_song_id, happy_prod, happy_unprod, sad_prod, sad_unprod, max_index, sp)
-                sp.add_to_queue(next_song_id)
-                sp.add_to_queue(random_second_next)
-
+        # print(playing['item']['id'])
+        curr_song_id = playing['item']['id']
+        if(playing['item']['duration_ms'] - playing['progress_ms'] <= 20000):
+            if(reset!=True):
+                print("RESET",reset)
+                reset = True
+                if len(curr_song_pred) > 0:
+                    max_value = max(curr_song_pred)
+                    max_index = curr_song_pred.index(max_value)
+                    predicted_mood = max_index
+                    # next_song_id must be sent to the front to be displayed
+                    # print("here")
+                    print(curr_song_id)
+                    # print(happy_prod)
+                    # print(happy_unprod)
+                    # print(sad_unprod)
+                    # print(sad_prod)
+                    # print(sad_unprod)
+                    # print(max_index)
+                    # print(sp)
+                    print("finished here")
+                    next_song_id, random_second_next = mood_changer(curr_song_id, happy_prod, happy_unprod, sad_prod, sad_unprod, max_index, sp)
+                    
+                    print(random_second_next)
+                    sp.add_to_queue(next_song_id)
+                    # sp.add_to_queue(random_second_next)
         else:
             reset = False
         return playing
@@ -105,7 +109,6 @@ def trackinfo(ws):
     songSend['song'] = cur
 
     ws.send(json.dumps(songSend, indent = 4))
-
     while True:
         tempCur = get_current()
         if(tempCur!=cur):
@@ -155,19 +158,19 @@ def mlinfo(ws):
 
     while True:
         if len(retr) > 1:
-            print("valid values, reseeting ")
+            # print("valid values, reseeting ")
             y_axis = retr[0]
             x_axis= retr[1]
         if(local_y != y_axis or local_x != x_axis):
-            print("HERE")
-            print(local_x , local_y)
+            # print("HERE")
+            # print(local_x , local_y)
             local_x = x_axis
             local_y = y_axis
-            print(local_x , local_y)
-            ws.send(build_json(local_x, local_y))
+            # print(local_x , local_y)
+            ws.send(build_json(local_x, -local_y))
             time.sleep(1.5)
         else:
-            print("NO UPDATE")
+            # print("NO UPDATE")
             time.sleep(1.5)
 
 @app.route("/predictions")
@@ -286,9 +289,9 @@ def consumer(queue, event):
             elif analyze['dominant_emotion'] in ['happy', 'surprised','neutral']:
                 retr.append(1)
             # retr.append() #here the first parameter is the image we want to analyze #the second one there is the action
-            print(analyze['dominant_emotion'])
+            # print(analyze['dominant_emotion'])
         except Exception as e: 
-            print(e)
+            # print(e)
             retr.append(0)
             
 

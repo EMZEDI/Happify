@@ -81,6 +81,7 @@ def create_feature_dataset(all_playlists_IDList: list, spotify: spotipy.Spotify)
     return final_df
 
 def get_song_features(songid, spotify):
+    # print("SONG FEATURE" , spotify.audio_features(songid))
     single_features = pd.Series(spotify.audio_features(songid)[0])
     return single_features
 
@@ -104,6 +105,8 @@ def mood_changer(current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, spot
         for feature in ["danceability", "energy", "liveness", "loudness"]:
             df.sort_values(by=[feature], inplace=True)
             # print(df)
+            print(df)
+            print("fFEATURE", current_features)
             if max(df[feature]) < current_features[feature]:
                 continue
             else:
