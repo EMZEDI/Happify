@@ -70,7 +70,7 @@ def get_current():
     playing = sp.current_user_playing_track()
     if playing:
         curr_song_id = playing['item']['artists'][0]['id']
-        if playing['item']['duration_ms'] - playing['progress_ms'] <= 10000:
+        if playing['item']['duration_ms'] - playing['progress_ms'] <= 20000:
             reset = True
             max_value = max(curr_song_pred)
             max_index = curr_song_pred.index(max_value)
