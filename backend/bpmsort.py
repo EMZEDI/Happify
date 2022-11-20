@@ -89,7 +89,7 @@ def mood_changer(current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, spot
     """
     A function designed to find the best choice to make the user happier
     """
-    
+
     current_features = get_song_features(current_songid, spot)
     item = [pl1, pl2, pl3, pl4][longterm_emotion]
     df = create_feature_dataset([item], spot)
@@ -110,6 +110,8 @@ def mood_changer(current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, spot
                     # print(df[feature])
                     # print(current_features[feature])
                     next_song = df[df[feature] > current_features[feature]]
+                    random_second_next = df.sample(1)
+
                     break
                 except:
                     continue
@@ -125,6 +127,7 @@ def mood_changer(current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, spot
                     # print(df[feature])
                     # print(current_features[feature])
                     next_song = df[df[feature] > current_features[feature]]
+                    random_second_next = df.sample(1)
                     break
                 except:
                     continue
@@ -137,6 +140,7 @@ def mood_changer(current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, spot
             else:
                 try:
                     next_song = df[df[feature] > current_features[feature]]
+                    random_second_next = df.sample(1)
                     break
                 except:
                     continue
@@ -144,8 +148,8 @@ def mood_changer(current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, spot
         # pick the song with the max danceability 
         df.sort_values(by=["danceability"], inplace=True)
         next_song = df
-        
-    return next_song.iloc[0,:].id
+    
+    return next_song.iloc[0,:].id, random_second_next.iloc[0,:].id
 
 
 if __name__ == "__main__":

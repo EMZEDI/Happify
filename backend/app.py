@@ -25,6 +25,7 @@ import numpy as np
 import time
 import dlib
 import cv2
+from bpmsort import mood_changer
 
 scope = "user-read-recently-played user-read-currently-playing ugc-image-upload user-read-private user-library-modify playlist-modify-public user-library-read playlist-read-private playlist-read-collaborative app-remote-control streaming"
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=cred.client_id, client_secret= cred.client_secret, redirect_uri=cred.redirect_url, scope=scope))
@@ -61,9 +62,11 @@ def previous_songs():
 
 @app.route("/current")
 def get_current():
+    global next_song_id
     global reset
     global predicted_mood
     global curr_song_pred 
+    global random_second_next
     playing = sp.current_user_playing_track()
     if playing:
         curr_song_id = playing['item']['artists'][0]['id']
@@ -72,6 +75,8 @@ def get_current():
             max_value = max(curr_song_pred)
             max_index = curr_song_pred.index(max_value)
             predicted_mood = max_index
+            # next_song_id must be sent to the front to be displayed
+            next_song_id, random_second_next = mood_changer(curr_song_id, happy_prod, happy_unprod, sad_prod, sad_unprod, max_index, sp)
         else:
             reset = False
         return playing
