@@ -51,6 +51,9 @@ B = []
 C = []
 D = []
 reset = False
+song_history = {}
+random_second_next = None
+first_iter = True
 
 @app.route("/playlists")
 def get_playlists():
@@ -66,6 +69,7 @@ def get_current():
     global reset
     global predicted_mood
     global curr_song_pred 
+    global first_iter
     global random_second_next
     playing = sp.current_user_playing_track()
     if playing:
@@ -90,8 +94,12 @@ def get_current():
                     # print(max_index)
                     # print(sp)
                     print("finished here")
-                    next_song_id, random_second_next = mood_changer(curr_song_id, happy_prod, happy_unprod, sad_prod, sad_unprod, max_index, sp)
-                    
+                    next_song_id, random_second_next, song_history = mood_changer(first_iter, random_second_next, curr_song_id, 
+                    happy_prod, happy_unprod, sad_prod, sad_unprod, max_index, song_history, sp)
+                    first_iter = False
+                    # the random next song is only to be shown to the user.
+                    # TODO: the condition of whether or not there is no song remaining must be checked
+
                     print(random_second_next)
                     sp.add_to_queue(next_song_id)
                     # sp.add_to_queue(random_second_next)

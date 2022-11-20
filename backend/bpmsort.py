@@ -86,7 +86,7 @@ def get_song_features(songid, spotify):
     return single_features
 
 # THE API functions are working. 
-def mood_changer(current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, spot):
+def mood_changer(first_iter: bool, second_random, current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, history: dict, spot):
     """
     A function designed to find the best choice to make the user happier
     """
@@ -95,10 +95,19 @@ def mood_changer(current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, spot
     item = [pl1, pl2, pl3, pl4][longterm_emotion]
     df = create_feature_dataset([item], spot)
     df = df[df['id'] != current_songid] # take care of repetition 
+    df = df[df['id'] not in history]
+    if len(df) == 0:
+        # error handling when all the songs among the playlist are played prev
+        return None, None, history
     # sort the dataframe based on the each mood
     # if the mood is overall good dont change anything
-    random_second_next = df.sample(1)
-    next_song = df.sample(1)
+    if first_iter:
+        # assign random
+        random_second_next = df.sample(1)
+        next_song = df.sample(1)
+    else:
+        next_song = second_random
+        random_second_next = df.sample(1)
 
     if longterm_emotion == 1:
         # add more dance songs 
@@ -152,8 +161,9 @@ def mood_changer(current_songid, pl1, pl2, pl3, pl4, longterm_emotion: int, spot
         # pick the song with the max danceability 
         df.sort_values(by=["danceability"], inplace=True)
         next_song = df
-    
-    return next_song.iloc[0,:].id, random_second_next.iloc[0,:].id
+
+    history[next_song.iloc[0,:].id] = 1
+    return next_song.iloc[0,:].id, random_second_next.iloc[0,:].id, history
 
 
 if __name__ == "__main__":
