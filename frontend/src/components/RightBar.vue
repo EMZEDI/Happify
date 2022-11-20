@@ -68,3 +68,4 @@ const props = defineProps(["x", "y"]);
   @apply mx-4 my-4 pb-0 bg-gray-100 rounded-lg shadow-sm;
 }
 </style>
+  
