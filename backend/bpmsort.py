@@ -95,7 +95,7 @@ def mood_changer(first_iter: bool, second_random, current_songid, pl1, pl2, pl3,
     item = [pl1, pl2, pl3, pl4][longterm_emotion]
     df = create_feature_dataset([item], spot)
     df = df[df['id'] != current_songid] # take care of repetition 
-    df = df[df['id'] not in history]
+
     if len(df) == 0:
         # error handling when all the songs among the playlist are played prev
         return None, None, history
