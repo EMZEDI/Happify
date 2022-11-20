@@ -7,7 +7,7 @@
       >
         <p>Happify intends to keep you always in the zone, remixing playlists of your choice gradually according to your current state of mind. </p>
 
-        <p class="mt-2">We use machine learning to calculate your current state then use an algorithm to select the best song as we transition you to the best playlist for your current state of mind.</p>
+        <p class="mt-2">We use machine learning and vision to calculate your current state then use an algorithm to queue the best song as we transition you to the best playlist for your current state of mind.</p>
 
         <p class="mt-2">We provide a digital dashboard to watch the live status of your Spotify state, emotional state, and upcoming songs as the machine learning model proposes new songs.</p>
 

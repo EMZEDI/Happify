@@ -123,6 +123,14 @@ def trackinfo(ws):
 
     sent_next = random_second_next
     while True:
+        if(random_second_next!=None and random_second_next!=sent_next):
+            sent_next = random_second_next
+            songSend = {}
+            print("sending next")
+            uptrackinfo = sp.track(sent_next)
+            print(uptrackinfo)
+            songSend['upnext'] = uptrackinfo
+            ws.send(json.dumps(songSend, indent = 4))
         tempCur = get_current()
         if(tempCur!=cur):
             if(tempCur and tempCur["item"]["name"] != cur["item"]["name"]):
@@ -139,14 +147,6 @@ def trackinfo(ws):
                 arraySend = {}
                 arraySend['played'] = listjson
                 ws.send(json.dumps(arraySend, indent=4))
-            if(random_second_next!=None and random_second_next!=sent_next):
-                sent_next = random_second_next
-                songSend = {}
-                songSend['upnext'] = sent_next
-                print("sending next")
-                uptrackinfo = sp.track(sent_next)
-                print(uptrackinfo)
-                ws.send(json.dumps(uptrackinfo, indent = 4))
             cur = tempCur
             songSend = {}
             songSend['song'] = tempCur

@@ -1,7 +1,7 @@
 <template>
   <div class="w-full h-screen flex">
     <div class="sidebar">
-      <PlayingSong :song="song" :previouslyplayed="previouslyplayed"/>
+      <PlayingSong :upnext="upnext" :song="song" :previouslyplayed="previouslyplayed"/>
     </div>
     <MovingShapes :x="xAxisAvg" :y="yAxisAvg" />
     <div class="sidebar absolute right-0 top-0">
@@ -22,6 +22,8 @@ const ws = ref(null);
 const mlws = ref(null);
 
 const song = ref(null);
+
+const upnext = ref(null)
 
 const previouslyplayed = ref(null);
 
@@ -44,6 +46,9 @@ onMounted(() => {
     } else if (blob.song != null) {
       song.value = blob.song;
       console.log("new song");
+    } else if(blob.upnext != null){
+      upnext.value = blob.upnext
+      console.log(blob.upnext)
     }
   };
   mlws.value.onmessage = function (event) {
