@@ -1,3 +1,4 @@
+[Happify.ai Devpost](https://devpost.com/software/happify-ai)
 
 # Demo
 https://user-images.githubusercontent.com/77243080/202915035-b649da26-aa31-41fe-8b50-4f9f7410e1ce.mp4
